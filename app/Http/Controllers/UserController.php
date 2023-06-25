@@ -32,15 +32,12 @@ class UserController extends Controller
         try {
             $userData = $request->only('name', 'email');
 
-            DB::beginTransaction();
             $userData['invitation_token'] = random_int(100000, 999999);
             $userData['password'] = Hash::make('123456');
             $userData['role'] = 'admin';
             $user = User::create($userData);
-            DB::commit();
             return $user;
         } catch (Exception $ex) {
-            DB::rollBack();
             return response()->json( new \Illuminate\Support\MessageBag(['catch_exception'=>$ex->getMessage()]), 403);
         }
     }
@@ -61,12 +58,9 @@ class UserController extends Controller
         try {
             $userData = $request->only('name', 'email');
             $user = User::find($id);
-            DB::beginTransaction();
             $user->update($userData);
-            DB::commit();
             return $user;
         } catch (Exception $ex) {
-            DB::rollBack();
             return response()->json( new \Illuminate\Support\MessageBag(['catch_exception'=>$ex->getMessage()]), 403);
         }
     }
@@ -75,14 +69,11 @@ class UserController extends Controller
     {
         try {
             $user = User::find($id);
-            DB::beginTransaction();
             $user->delete();
-            DB::commit();
 
             $users = User::all();
             return response()->json($users);
         } catch (Exception $ex) {
-            DB::rollBack();
             return 'Delete Failed';
         }
     }

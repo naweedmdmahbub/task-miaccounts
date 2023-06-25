@@ -4,7 +4,7 @@
         <h1>
             User List
             <router-link to="/users/create" style="text-decoration: none; color: inherit;">
-                <el-button type="primary" v-if="logged_in_user && logged_in_user.role === 'Super-Admin'" style="float: right;">
+                <el-button type="primary" v-if="logged_in_user && logged_in_user.role === 'superadmin'" style="float: right;">
                     Create
                 </el-button>
             </router-link>
@@ -16,7 +16,7 @@
             <el-table-column prop="role" label="Role" />
             <el-table-column prop="id" label="Operations" >
                 <template  #default="scope">
-                    <router-link :to="'/users/edit/'+scope.row.id" v-if="logged_in_user && logged_in_user.role === 'Super-Admin'">
+                    <router-link :to="'/users/edit/'+scope.row.id" v-if="logged_in_user && logged_in_user.role === 'superadmin'">
                         <el-icon :size="20" style="width: 1em; height: 1em; margin-right: 8px" >
                             <Edit />
                         </el-icon>
@@ -29,7 +29,7 @@
                     <el-icon :size="20" :color="'red'"
                             style="width: 1em; height: 1em; margin-right: 8px"
                             @click="handleDelete(scope.row.id);"
-                             v-if="logged_in_user && logged_in_user.role === 'Super-Admin'"
+                             v-if="logged_in_user && logged_in_user.role === 'superadmin'"
                     >
                         <Delete />
                     </el-icon>
@@ -63,7 +63,6 @@ export default {
             await axios.get(`/logged_in_user`).
                     then((res) => {
                         this.logged_in_user = res.data;
-                        console.log('logged_in_user:', this.logged_in_user);
                     });
         } catch (error) {
             console.error(error);

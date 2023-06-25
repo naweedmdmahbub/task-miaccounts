@@ -1,6 +1,6 @@
 <template>
     <div v-if="isCreated">
-        <div v-if="(logged_in_user && logged_in_user.role === 'Super-Admin') || operation === 'view'">
+        <div v-if="(logged_in_user && logged_in_user.role === 'superadmin') || operation === 'view'">
             <el-form ref="ruleFormRef" :model="user" class="demo-user"
                 label-position="top"
                 status-icon

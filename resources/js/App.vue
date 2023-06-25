@@ -6,11 +6,40 @@
                     <el-menu>
                         <router-link to="/users" style="text-decoration: none;"
                                      :style="[$route.path === '/users' ? {color: 'royalblue'} : {color: 'black'}]">
-                            <el-menu-item index="4">
+                            <el-menu-item index="1">
                                 <el-icon :size="20" style="width: 1em; height: 1em; margin-right: 8px">
                                     <User />
                                 </el-icon>
                                 Users
+                            </el-menu-item>
+                        </router-link>
+                        <router-link to="/groups" style="text-decoration: none;"
+                                     :style="[$route.path === '/groups' ? {color: 'royalblue'} : {color: 'black'}]">
+                            <el-menu-item index="2">
+                                <el-icon :size="20" style="width: 1em; height: 1em; margin-right: 8px">
+                                    <User />
+                                </el-icon>
+                                Groups
+                            </el-menu-item>
+                        </router-link>
+
+                        <router-link to="/account-heads" style="text-decoration: none;"
+                                     :style="[$route.path === '/account-heads' ? {color: 'royalblue'} : {color: 'black'}]">
+                            <el-menu-item index="3">
+                                <el-icon :size="20" style="width: 1em; height: 1em; margin-right: 8px">
+                                    <User />
+                                </el-icon>
+                                Account Heads
+                            </el-menu-item>
+                        </router-link>
+
+                        <router-link to="/transactions" style="text-decoration: none;"
+                                     :style="[$route.path === '/transactions' ? {color: 'royalblue'} : {color: 'black'}]">
+                            <el-menu-item index="4">
+                                <el-icon :size="20" style="width: 1em; height: 1em; margin-right: 8px">
+                                    <User />
+                                </el-icon>
+                                Transactions
                             </el-menu-item>
                         </router-link>
 
