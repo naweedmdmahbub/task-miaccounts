@@ -21,6 +21,10 @@
                 style="width:100%"
               >
                 <el-option
+                    :label="'None'"
+                    :value="null"
+                />
+                <el-option
                   v-for="(val, index) in groups"
                   :key="index"
                   :label="val.name"

@@ -12,7 +12,24 @@ class Group extends Model
     public function subGroups(){
         return $this->hasMany(Group::class, 'parent_id', 'id');
     }
-    public function parentGroup(){
+    public function parent(){
         return $this->belongsTo(Group::class, 'parent_id', 'id');
+    }
+
+    
+    public function getAllParentGroups()
+    {
+        $parents = [];
+
+        if ($this->parent_id) {
+            $parent = $this->parent;
+            $parents[] = $parent;
+
+            if ($parent) {
+                $parents = array_merge($parents, $parent->getAllParentGroups());
+            }
+        }
+
+        return $parents;
     }
 }

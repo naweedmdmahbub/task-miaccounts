@@ -14,12 +14,18 @@ class TransactionController extends Controller
     {
         $searchParams = $request->all();
         $limit = Arr::get($searchParams, 'limit', 10);
+        $keyword = Arr::get($searchParams, 'keyword', '');
         $transactionsQuery = Transaction::with(['accountHead' => function ($query) {
                                 $query->select('id', 'name');
                             }])
                             ->select('date', 'id', 'account_head_id', 'debit', 'credit',
                                     DB::raw('(debit-credit) as amount')
-                            );
+                            )
+                            ->when(!empty($keyword), function ($query) use ($keyword) {
+                                return $query->whereHas('accountHead',function ( $subquery ) use ($keyword){
+                                                $subquery->where('name', 'LIKE', '%' . $keyword . '%');
+                                            });
+                            });
 
         return response()->json($transactionsQuery->paginate($limit));
     }

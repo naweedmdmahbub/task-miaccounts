@@ -11,6 +11,21 @@
             </router-link>
         </h1>
 
+        <div class="filter-container">
+            <el-input
+                v-model="query.keyword"
+                placeholder="Keyword"
+                style="width: 200px;"
+            />
+            <el-button type="primary" @click="handleFilter">
+                <el-icon style="vertical-align: middle">
+                    <Search />
+                </el-icon>
+                <span style="vertical-align: middle"> Search </span>
+            </el-button>
+        </div>
+
+
         <el-table :data="transactions">
             <el-table-column prop="date" label="Date" />
             <el-table-column prop="debit" label="Debit">
@@ -83,6 +98,7 @@ export default {
             query: {
                 page: 1,
                 limit: 10,
+                keyword: '',
             },
             total: 10,
             totalPages: null,
@@ -149,6 +165,10 @@ export default {
         },
         handlePageChange(currentPage) {
             this.query.page = currentPage;
+            this.getList();
+        },
+        handleFilter() {
+            this.query.page = 1;
             this.getList();
         },
     },

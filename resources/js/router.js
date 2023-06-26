@@ -7,6 +7,8 @@ import TransactionCreate from './components/Transactions/Create.vue';
 import TransactionList from './components/Transactions/List.vue';
 import AccountHeadCreate from './components/AccountHeads/Create.vue';
 import AccountHeadList from './components/AccountHeads/List.vue';
+import AmountListByGroup from './components/Amounts/ListByGroup.vue';
+import AmountListByAccountHead from './components/Amounts/ListByAccountHead.vue';
 import NotFoundPage from './components/NotFoundPage.vue';
 import Dashboard from './components/Dashboard.vue';
 
@@ -102,6 +104,18 @@ const routes = [
         name: 'TransactionView',
         component: TransactionCreate
     },
+
+    {
+        path: '/amount-by-group',
+        name: 'AmountListByGroup',
+        component: AmountListByGroup
+    },
+    {
+        path: '/amount-by-account-head',
+        name: 'AmountListByAccountHead',
+        component: AmountListByAccountHead
+    },
+    
     {
         path: '/:pathMatch(.*)*',
         component: NotFoundPage

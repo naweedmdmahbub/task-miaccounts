@@ -45,3 +45,6 @@ Route::post('/account-heads', [App\Http\Controllers\AccountHeadController::class
 Route::get('/account-heads/edit/{id}', [App\Http\Controllers\AccountHeadController::class, 'edit'])->name('account-heads.edit');
 Route::post('/account-heads/{id}', [App\Http\Controllers\AccountHeadController::class, 'update'])->name('account-heads.update');
 Route::delete('/account-heads/{id}', [App\Http\Controllers\AccountHeadController::class, 'delete'])->name('account-heads.delete');
+
+Route::get('/amount-by-group', [App\Http\Controllers\AmountController::class, 'byGroup'])->name('amounts.byGroup');
+Route::get('/amount-by-account-head', [App\Http\Controllers\AmountController::class, 'byAccountHead'])->name('amounts.byAccountHead');

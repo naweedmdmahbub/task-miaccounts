@@ -28,7 +28,7 @@
 
         <el-table :data="groups">
             <el-table-column prop="name" label="Name" />
-            <el-table-column prop="parent_group.name" label="Parent Group" />
+            <el-table-column prop="parent.name" label="Parent Group" />
             <el-table-column prop="id" label="Operations" >
                 <template  #default="scope">
                     <router-link :to="'/groups/edit/'+scope.row.id"  v-if="logged_in_user && logged_in_user.role === 'superadmin'">

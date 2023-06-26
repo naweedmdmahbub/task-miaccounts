@@ -14,7 +14,7 @@ class GroupController extends Controller
         $searchParams = $request->all();
         $limit = Arr::get($searchParams, 'limit', 10);
         $keyword = Arr::get($searchParams, 'keyword', '');
-        $groupsQuery = Group::with(['parentGroup' => function ($query) {
+        $groupsQuery = Group::with(['parent' => function ($query) {
                                 $query->select('id', 'name');
                             }])
                             ->select('name', 'id', 'parent_id')
@@ -40,7 +40,7 @@ class GroupController extends Controller
 
     public function edit($id)
     {
-        $group = Group::with('parentGroup')->find($id);
+        $group = Group::with('parent')->find($id);
         return response()->json($group);
     }
 

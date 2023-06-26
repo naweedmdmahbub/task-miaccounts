@@ -43,6 +43,27 @@
                             </el-menu-item>
                         </router-link>
 
+                        
+                        <router-link to="/amount-by-group" style="text-decoration: none;"
+                                     :style="[$route.path === '/amount-by-group' ? {color: 'royalblue'} : {color: 'black'}]">
+                            <el-menu-item index="5">
+                                <el-icon :size="20" style="width: 1em; height: 1em; margin-right: 8px">
+                                    <User />
+                                </el-icon>
+                                Group Amount
+                            </el-menu-item>
+                        </router-link>
+
+                        <router-link to="/amount-by-account-head" style="text-decoration: none;"
+                                     :style="[$route.path === '/amount-by-account-head' ? {color: 'royalblue'} : {color: 'black'}]">
+                            <el-menu-item index="6">
+                                <el-icon :size="20" style="width: 1em; height: 1em; margin-right: 8px">
+                                    <User />
+                                </el-icon>
+                                Account Head Amount
+                            </el-menu-item>
+                        </router-link>
+
                     </el-menu>
 
 
