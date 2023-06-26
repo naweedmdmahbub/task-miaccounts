@@ -21,12 +21,9 @@
         </div> -->
 
 
-        <el-table :data="amounts">
-            <el-table-column prop="id" label="Acc Head id" />
-            <el-table-column prop="group_level_1_name" label="Group Level 1" />
-            <el-table-column prop="group_level_2_name" label="Group Level 2" />
-            <el-table-column prop="group_level_3_name" label="Group Level 3" />
-            <el-table-column prop="name" label="Acc Head" />  
+        <el-table :data="groups">
+            <el-table-column prop="name" label="Group" /> 
+            <el-table-column prop="name" label="Group/Heads" /> 
             <el-table-column prop="amount" label="Amount" />
         </el-table>
 
@@ -56,7 +53,7 @@ export default {
     name: 'TransactionList',
     data() {
         return {
-            amounts: [],
+            groups: [],
             logged_in_user: null,
             query: {
                 page: 1,
@@ -88,8 +85,8 @@ export default {
             }
             await axios.get(`/api/amount-by-group`, {params}).
                     then((res) => {
-                        console.log('res:', res);
-                        this.amounts = res.data;
+                        console.log('res:', res.data);
+                        this.groups = res.data;
                         this.query.page = res.data.current_page;
                         this.total = res.data.total;
                         this.totalPages = Math.ceil(res.data.total / this.pageSize); // Calculate the total number of pages

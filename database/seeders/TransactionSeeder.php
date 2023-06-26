@@ -17,12 +17,12 @@ class TransactionSeeder extends Seeder
         $startDate = Carbon::now()->subDays(30);
         $data = [];
 
-        for ($i = 1; $i <= 10; $i++) {
+        for ($i = 1; $i <= 30; $i++) {
             $single_transaction = [
                 'date' => $startDate->copy()->addDays(rand(0, 29))->format('Y-m-d'),
                 'debit' => mt_rand(50,100),
                 'credit' => mt_rand(30,50),
-                'account_head_id' => rand(1, 3),
+                'account_head_id' => rand(1, 8),
                 'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
                 'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
             ];

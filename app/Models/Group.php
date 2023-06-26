@@ -9,27 +9,19 @@ class Group extends Model
 {
     use HasFactory;
     protected $fillable = ['name', 'parent_id'];
-    public function subGroups(){
+    public function subgroups(){
         return $this->hasMany(Group::class, 'parent_id', 'id');
     }
     public function parent(){
         return $this->belongsTo(Group::class, 'parent_id', 'id');
     }
 
+    public function accountHeads(){
+        return $this->hasMany(AccountHead::class);
+    }
     
-    public function getAllParentGroups()
+    public function allSubgroups()
     {
-        $parents = [];
-
-        if ($this->parent_id) {
-            $parent = $this->parent;
-            $parents[] = $parent;
-
-            if ($parent) {
-                $parents = array_merge($parents, $parent->getAllParentGroups());
-            }
-        }
-
-        return $parents;
+        return $this->subgroups()->with('allSubgroups', 'accountHeads.transactions');
     }
 }

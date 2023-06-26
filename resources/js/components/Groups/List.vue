@@ -30,7 +30,7 @@
             <el-table-column prop="name" label="Name" />
             <el-table-column prop="parent.name" label="Parent Group" />
             <el-table-column prop="id" label="Operations" >
-                <template  #default="scope">
+                <template #default="scope">
                     <router-link :to="'/groups/edit/'+scope.row.id"  v-if="logged_in_user && logged_in_user.role === 'superadmin'">
                         <el-icon :size="20" style="width: 1em; height: 1em; margin-right: 8px" >
                             <Edit />
