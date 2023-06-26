@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('account_head_id');
-            $table->double('date');
+            $table->text('date');
             $table->double('debit');
             $table->double('credit');
             $table->timestamps();

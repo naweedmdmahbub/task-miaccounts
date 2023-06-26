@@ -8,9 +8,13 @@
         <el-text tag="b" v-if="operation === 'create'" type="primary" size="large">Create Transaction</el-text>
 
 
-        <el-card class="box-card">            
-            <el-form-item label="Name" prop="name" required>
-                <el-input v-model="transaction.name" type="text" :disabled="operation === 'view'" />
+        <el-card class="box-card">
+            <el-form-item label="Date" required>
+                <el-date-picker v-model="transaction.date" type="date" label="Pick a date" placeholder="Pick a date"
+                    format="YYYY-MM-DD"
+                    value-format="YYYY-MM-DD"
+                    style="width: 100%"
+                    :disabled="operation === 'view'" />
             </el-form-item>
             
             <el-form-item label="Account Head" prop="account_head">
@@ -28,6 +32,33 @@
                 />
               </el-select>
             </el-form-item>
+
+            
+            <el-row :gutter="10">
+                <el-col :span="8" class="inline">
+                    <el-form-item label="Debit" prop="debit">
+                        <el-input v-model="transaction.debit" type="number" 
+                                    :disabled="operation === 'view'"
+                                    @blur="calculateTotal"
+                                    style="width:100%" />
+                    </el-form-item>
+                </el-col>
+                <el-col :span="8" class="inline">
+                    <el-form-item label="Credit" prop="credit">
+                        <el-input v-model="transaction.credit" type="number" 
+                                    :disabled="operation === 'view'"
+                                    @blur="calculateTotal"
+                                    style="width:100%" />
+                    </el-form-item>
+                </el-col>
+                <el-col :span="8" class="inline">
+                    <el-form-item label="Amount" prop="amount">
+                        <el-input v-model="transaction.amount" type="number" 
+                                placeholder="Total" disabled
+                                style="width:100%" />
+                    </el-form-item>
+                </el-col>
+            </el-row>
 
 
             <el-row>
@@ -55,8 +86,11 @@ export default {
             operation: 'create',
             transaction : {
                 id: null,
-                name: '',
+                date: '',
+                debit: 0,
+                credit: 0,
                 account_head_id: null,
+                amount: 0
             },
             account_heads: [],
             selectedAccountHead: null,
@@ -76,13 +110,13 @@ export default {
         }
         // console.log('Route Name: ', this.$route.name);
         if(this.transaction.id){
-            axios.get(`/api/transactions/edit/`+this.transaction.id).
+            await axios.get(`/api/transactions/edit/`+this.transaction.id).
                     then((res) => {
-                        console.log('res:', res);
-                        this.transaction.id = res.data.id;
-                        this.transaction.name = res.data.name;
+                        // console.log('res:', res);
+                        this.transaction = res.data;
                         this.selectedAccountHead = res.data.account_head_id;
                     });
+            this.calculateTotal();
             console.log('Transaction edit', this.transaction)
         }
 
@@ -94,6 +128,9 @@ export default {
                 });
     },
     methods: {
+        calculateTotal() {
+            this.transaction.amount = (parseFloat(this.transaction.debit) - parseFloat(this.transaction.credit)).toFixed(2);
+        },
         async createTransaction() {
             this.transaction.account_head_id = this.selectedAccountHead;
             try {

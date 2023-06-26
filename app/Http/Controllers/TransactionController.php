@@ -6,6 +6,7 @@ use App\Http\Requests\TransactionRequest;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 
 class TransactionController extends Controller
 {
@@ -13,14 +14,12 @@ class TransactionController extends Controller
     {
         $searchParams = $request->all();
         $limit = Arr::get($searchParams, 'limit', 10);
-        $keyword = Arr::get($searchParams, 'keyword', '');
         $transactionsQuery = Transaction::with(['accountHead' => function ($query) {
                                 $query->select('id', 'name');
                             }])
-                            ->select('name', 'id', 'account_head_id')
-                            ->when(!empty($keyword), function ($query) use ($keyword) {
-                                return $query->where('name', 'LIKE', '%' . $keyword . '%');
-                            });
+                            ->select('date', 'id', 'account_head_id', 'debit', 'credit',
+                                    DB::raw('(debit-credit) as amount')
+                            );
 
         return response()->json($transactionsQuery->paginate($limit));
     }
@@ -48,7 +47,7 @@ class TransactionController extends Controller
     public function update(TransactionRequest $request, $id)
     {
         try {
-            $transactionData = $request->only('name', 'account_head_id');
+            $transactionData = $request->only('account_head_id', 'date', 'debit', 'credit');
             $transaction = Transaction::find($id);
             $transaction->update($transactionData);
             return $transaction;
@@ -62,8 +61,7 @@ class TransactionController extends Controller
         try {
             $transaction = Transaction::find($id);;
             $transaction->delete();
-            $transactions = Transaction::all();
-            return response()->json($transactions);
+            return 'Delete Successful';
         } catch (Exception $ex) {
             return 'Delete Failed';
         }
@@ -72,7 +70,9 @@ class TransactionController extends Controller
     
     public function getAllTransactions()
     {
-        $transactions = Transaction::all();
+        $transactions = Transaction::with(['accountHead' => function ($query) {
+                                $query->select('id', 'name');
+                            }])->get();
         return response()->json($transactions);
     }
 }

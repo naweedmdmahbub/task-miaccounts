@@ -24,7 +24,6 @@ class AccountHeadController extends Controller
 
     public function store(AccountHeadRequest $request)
     {
-        // dd(config('app.url'));
         try {
             $accountHeadData = $request->only('name', 'group_id');
             $accountHead = AccountHead::create($accountHeadData);

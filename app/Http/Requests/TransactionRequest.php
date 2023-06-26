@@ -22,12 +22,11 @@ class TransactionRequest extends FormRequest
      */
     public function rules(): array
     {
-        $transactionId = $this->route('id');
         $rules = [
-            'name' => [
-                'required',
-                Rule::unique('transactions', 'name')->ignore($transactionId),
-            ],
+            'date' => 'required',
+            'account_head_id' => 'required',
+            'debit' => 'required|numeric',
+            'credit' => 'required|numeric',
         ];
         return $rules;
     }

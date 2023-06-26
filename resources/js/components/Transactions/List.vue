@@ -11,24 +11,24 @@
             </router-link>
         </h1>
 
-        <div class="filter-container">
-            <el-input
-                v-model="query.keyword"
-                placeholder="Keyword"
-                style="width: 200px;"
-            />
-            <el-button type="primary" @click="handleFilter">
-                <el-icon style="vertical-align: middle">
-                    <Search />
-                </el-icon>
-                <span style="vertical-align: middle"> Search </span>
-            </el-button>
-        </div>
-
-
         <el-table :data="transactions">
-            <el-table-column prop="name" label="Name" />
-            <!-- <el-table-column prop="account_head.name" label="Account Head" /> -->
+            <el-table-column prop="date" label="Date" />
+            <el-table-column prop="debit" label="Debit">
+                <template #default="scope">
+                    {{ formattedValue(scope.row.debit) }}
+                </template>
+            </el-table-column>
+            <el-table-column prop="credit" label="Credit">
+                <template #default="scope">
+                    {{ formattedValue(scope.row.credit) }}
+                </template>
+            </el-table-column>
+            <el-table-column prop="amount" label="Amount">
+                <template #default="scope">
+                    {{ formattedValue(scope.row.amount) }}
+                </template>
+            </el-table-column>
+            <el-table-column prop="account_head.name" label="Account Head" />
             <el-table-column prop="id" label="Operations" >
                 <template  #default="scope">
                     <router-link :to="'/transactions/edit/'+scope.row.id"  v-if="logged_in_user && logged_in_user.role === 'superadmin'">
@@ -83,7 +83,6 @@ export default {
             query: {
                 page: 1,
                 limit: 10,
-                keyword: '',
             },
             total: 10,
             totalPages: null,
@@ -114,9 +113,8 @@ export default {
                 }
             ).then(() => {
                 axios.delete(`/api/transactions/`+id).
-                    then((res) => {
-                        console.log('res:', res);
-                        this.transactions = res.data;
+                    then(() => {
+                        this.getList();
                         ElMessage({
                             type: 'success',
                             message: 'Delete completed',
@@ -130,10 +128,6 @@ export default {
             })
         },
 
-        handleFilter() {
-            this.query.page = 1;
-            this.getList();
-        },
         async getList() {
             let params = {
                 limit: this.pageSize,
@@ -142,7 +136,7 @@ export default {
             }
             await axios.get(`/api/transactions`, {params}).
                     then((res) => {
-                        console.log('res:', res);
+                        // console.log('res:', res);
                         this.transactions = res.data.data;
                         this.query.page = res.data.current_page;
                         this.total = res.data.total;
@@ -158,6 +152,15 @@ export default {
             this.getList();
         },
     },
+    computed: {
+        formattedValue() {
+            return (val) => {
+                if(val != 'undefined' || val != null){
+                    return val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });                
+                }
+            };
+        },
+    }
 };
 </script>
 
