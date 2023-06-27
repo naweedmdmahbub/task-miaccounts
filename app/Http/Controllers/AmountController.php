@@ -67,13 +67,46 @@ class AmountController extends Controller
         //                 //          'transactions.id as transaction_id', DB::raw('SUM(debit-credit) as amount'))
         //                 ->whereNull('parent_id')->get();
 
-        $groups = Group::with('accountHeads.transactions', 'allSubgroups', 'allSubgroups.accountHeads')
+        $groups = Group::with('accountHeads.transactions', 'allSubgroups', 'allSubgroups.accountHeads.transactions')
                     ->whereNull('parent_id')
                     ->get();
         // return $groups;
 
+        $results = $groups->map(function ($group){
+            //group 1
+            $group->allSubgroups->map(function($subgroup){
+                //group 2,6
+                if($subgroup->allSubgroups){
+                    $subgroup->allSubgroups->map(function($subgroup){
+                        //group 4
+                        if($subgroup->accountHeads){
+                            $subgroup->accountHeads->map(function($accountHead){
+                                $amount = $accountHead->transactions->sum('debit') - $accountHead->transactions->sum('credit');
+                                $accountHead->amount = $amount;
+                                $accountHead->level = 3;
+                                unset($accountHead->transactions);
+                            });
+                        }
+                        $subgroup->level = 2;
+                        $subgroup->amount = $subgroup->accountHeads->sum('amount');
+                    });
+                    $subgroup->level = 1;
+                    $subgroup->amount = $subgroup->accountHeads->sum('amount') + $subgroup->allSubgroups->sum('amount');
+                }
+                if($subgroup->accountHeads){
+                    $subgroup->accountHeads->map(function($accountHead){
+                        $amount = $accountHead->transactions->sum('debit') - $accountHead->transactions->sum('credit');
+                        $accountHead->amount = $amount;
+                        $accountHead->level = 2;
+                        unset($accountHead->transactions);
+                    });
+                }
+                // $subgroup->amount = $subgroup->accountHeads->sum('amount');
+                $subgroup->amount = $subgroup->accountHeads->sum('amount') + $subgroup->allSubgroups->sum('amount');
+                $subgroup->level = 1;
+                // dd($subgroup);
+            });
 
-        $result = $groups->map(function ($group) {
             //group 1
             $group->accountHeads->map(function($accountHead){
                 $amount = $accountHead->transactions->sum('debit') - $accountHead->transactions->sum('credit');
@@ -84,51 +117,6 @@ class AmountController extends Controller
             });
 
 
-            // dump($groupAmount);
-            //group 1
-            $group->allSubgroups->map(function($subgroup){
-                if($subgroup->accountHeads){
-                    $subgroup->accountHeads->map(function($accountHead){
-                        $amount = $accountHead->transactions->sum('debit') - $accountHead->transactions->sum('credit');
-                        $accountHead->amount = $amount;
-                        $accountHead->level = 2;
-                        unset($accountHead->transactions);
-                    });
-                }
-                //group 2,6
-                if($subgroup->allSubgroups){
-                    $subgroup->allSubgroups->map(function($subgroup){
-                        if($subgroup->accountHeads){
-                            $subgroup->accountHeads->map(function($accountHead){
-                                $amount = $accountHead->transactions->sum('debit') - $accountHead->transactions->sum('credit');
-                                $accountHead->amount = $amount;
-                                $accountHead->level = 3;
-                                unset($accountHead->transactions);
-                            });
-                        }
-
-                        //group 4
-                        if($subgroup->allSubgroups){
-                            $subgroup->allSubgroups->map(function($subgroup){
-                                if($subgroup->accountHeads){
-                                    $subgroup->accountHeads->map(function($accountHead){
-                                        $amount = $accountHead->transactions->sum('debit') - $accountHead->transactions->sum('credit');
-                                        $accountHead->amount = $amount;
-                                        unset($accountHead->transactions);
-                                    });
-                                }
-                            });
-                        }
-                        $subgroup->level = 2;
-                        $subgroup->amount = $subgroup->accountHeads->sum('amount') + $subgroup->allSubgroups->sum('amount');
-                    });
-                    $subgroup->level = 1;
-                }
-                // $subgroup->amount = $subgroup->accountHeads->sum('amount');
-                $subgroup->amount = $subgroup->accountHeads->sum('amount') + $subgroup->allSubgroups->sum('amount');
-                $subgroup->level = 1;
-                // dd($subgroup);
-            });
             // dd($group->accountHeads, $group);
             $group->amount = $group->accountHeads->sum('amount') + $group->allSubgroups->sum('amount');
                 // if($group->id == 5)
@@ -143,6 +131,76 @@ class AmountController extends Controller
                 'allSubgroups' => $group->allSubgroups,
             ];
         });
-        return $result;
+        
+
+
+        $items = [];
+        $results->each(function($result) use(&$items){
+            // dd($result, $result['allSubgroups']);
+            //getting level 0 group
+            $items[] = [
+                'group' => $result['name'],
+                'group_head' => null,
+                'level' => $result['level'],
+                'amount' => $result['amount'],
+            ];
+            $result['allSubgroups']->each(function($subgroup) use(&$items){
+                //getting level 1 subgroup
+                // dd($subgroup);
+                $items[] = [
+                    'group' => null,
+                    'group_head' => $subgroup->name,
+                    'level' => $subgroup->level,
+                    'amount' => $subgroup->amount,
+                ];
+                $subgroup['allSubgroups']->each(function($subgroup) use(&$items){
+                    //getting level 2 subgroup
+                    $items[] = [
+                        'group' => null,
+                        'group_head' => $subgroup->name,
+                        'level' => $subgroup->level,
+                        'amount' => $subgroup->amount,
+                    ];
+                    //getting level 3 accountHeads
+                    if(count($subgroup['accountHeads'])){
+                        $subgroup['accountHeads']->each(function($accountHead) use(&$items){
+                            $items[] = [
+                                'group' => null,
+                                'group_head' => $accountHead->name,
+                                'level' => $accountHead->level,
+                                'amount' => $accountHead->amount,
+                            ];
+                        });
+                    }
+                });
+                //getting level 2 accountHeads
+                $subgroup['accountHeads']->each(function($accountHead) use(&$items){
+                    $items[] = [
+                        'group' => null,
+                        'group_head' => $accountHead->name,
+                        'level' => $accountHead->level,
+                        'amount' => $accountHead->amount,
+                    ];
+                });
+            });
+
+            $result['accountHeads']->each(function($accountHead) use(&$items){
+                // dd($accountHead);
+                //getting level 2 allSubgroups
+                $items[] = [
+                    'group' => null,
+                    'group_head' => $accountHead->name,
+                    'level' => $accountHead->level,
+                    'amount' => $accountHead->amount,
+                ];
+            });
+        });
+
+        // return $items;
+        // return $results;
+        return [
+            'results' => $results,
+            'items' => $items,
+        ];
     }
 }

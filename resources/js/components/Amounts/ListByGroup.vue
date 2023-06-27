@@ -22,10 +22,19 @@
 
 
         <el-table :data="groups">
-            <el-table-column prop="name" label="Group" /> 
-            <el-table-column prop="name" label="Group/Heads" /> 
+            <el-table-column prop="group" label="Group" width="120" /> 
+            <el-table-column prop="group_head" label="Group/Heads">               
+                <template #default="scope">
+                    <el-row >
+                        <el-col :offset="(scope.row.level-1)*6" :span="12">
+                            {{ scope.row.group_head }}
+                        </el-col>
+                    </el-row>
+                </template>
+            </el-table-column>
             <el-table-column prop="amount" label="Amount" />
         </el-table>
+
 
 
         <div class="demo-pagination-block">
@@ -86,7 +95,7 @@ export default {
             await axios.get(`/api/amount-by-group`, {params}).
                     then((res) => {
                         console.log('res:', res.data);
-                        this.groups = res.data;
+                        this.groups = res.data.items;
                         this.query.page = res.data.current_page;
                         this.total = res.data.total;
                         this.totalPages = Math.ceil(res.data.total / this.pageSize); // Calculate the total number of pages
