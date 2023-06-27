@@ -95,7 +95,7 @@ export default {
             await axios.get(`/api/amount-by-group`, {params}).
                     then((res) => {
                         console.log('res:', res.data);
-                        this.groups = res.data.items;
+                        this.groups = res.data;
                         this.query.page = res.data.current_page;
                         this.total = res.data.total;
                         this.totalPages = Math.ceil(res.data.total / this.pageSize); // Calculate the total number of pages
